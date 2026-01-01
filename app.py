@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score, mean_squared_error as MSE
 import warnings
 from sklearn.exceptions import InconsistentVersionWarning
+import sweetviz as sv
 import numpy as np
-
 
 st.set_page_config(layout="wide")
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
@@ -59,9 +59,9 @@ def plot_hist(df, col_name, plot_title, xlabel, ylabel):
 
     fig_nbins = st.slider('Количество бинов гистограммы', 25, 300, 25)
     fig = px.histogram(df, col_name,
-                    title=plot_title,
-                    labels={'selling_price': 'Цена (тыс. руб)', 'count': 'Количество автомобилей'},
-                    nbins=fig_nbins)
+            title=plot_title,
+            labels={'selling_price': 'Цена', 'count': 'Количество автомобилей'},
+            nbins=fig_nbins)
 
     fig.update_layout(
         bargap=0.1,
@@ -70,7 +70,6 @@ def plot_hist(df, col_name, plot_title, xlabel, ylabel):
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
 
 
 with st.sidebar:
@@ -92,6 +91,12 @@ plot_hist(df_train, 'selling_price',
     xlabel="Цена",
     ylabel="Количество"
 )
+
+# тут я сильно не успевала построить дашборд руками, поэтому вывела результаты из библиотеки
+report = sv.analyze(df_train)
+with open('report.html', 'r', encoding='utf-8') as f:
+    html_content = f.read()
+st.components.v1.html(html_content, height=1000, scrolling=True)
 
 if test_file is not None:
     st.divider()
@@ -138,6 +143,5 @@ if test_file is not None:
         )
         st.plotly_chart(fig1, use_container_width=True)
         
-
-    except:
-        pass
+    except Exception as e:
+        st.error(e)
